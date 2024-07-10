@@ -20,25 +20,28 @@ int main()
     }
     
     vector<vector<int>> vis(n, vector<int>(m, 0));
+    vector<vector<char>> par(n, vector<char>(m));
     
-    priority_queue<pair<vector<int>, string>, vector<pair<vector<int>, string>>, greater<pair<vector<int>, string>>> q;
-    q.push({{0, x, y}, ""});
+    priority_queue<vector<int>, vector<vector<int>>, greater<vector<int>>> q;
+    q.push({0, x, y});
     vis[x][y] = 1;
     int f = 0;
+    par[x][y] = '/';
+    
+    int dstx, dsty;
     
     while(!q.empty()) {
-        int i = q.top().first[1];
-        int j = q.top().first[2];
-        int steps = q.top().first[0];
-        string s = q.top().second;
-        
+        int i = q.top()[1];
+        int j = q.top()[2];
+        int steps = q.top()[0];
         q.pop();
         
         if(grid[i][j] == 'B') {
             f = 1;
+            dstx = i;
+            dsty = j;
             cout<<"YES"<<endl;
             cout<<steps<<endl;
-            cout<<s<<endl;
             break;
         }
         
@@ -47,19 +50,39 @@ int main()
             int nj = j + dy[k];
             
             if(ni >= 0 && ni < n && nj >= 0 && nj < m && !vis[ni][nj] && (grid[ni][nj] == '.' || grid[ni][nj] == 'B')) {
-                if(k == 0) s += 'R';
-                else if(k == 1) s += 'D';
-                else if(k == 2) s += 'L';
-                else s += 'U';
+                if(k == 0) par[ni][nj] = 'R';
+                else if(k == 1) par[ni][nj] = 'D';
+                else if(k == 2) par[ni][nj] = 'L';
+                else par[ni][nj] = 'U';
                 
-                q.push({{steps+1, ni, nj}, s});
+                q.push({steps+1, ni, nj});
                 vis[ni][nj] = 1;
-                s.pop_back();
             }
         }
     }
     
     if(!f) cout<<"NO"<<endl;
+    else {
+        string s = "";
+        int i = dstx, j = dsty;
+        while(par[i][j] != '/') {
+            s += par[i][j];
+            if(par[i][j] == 'R') {
+                j--;
+            }
+            else if(par[i][j] == 'D') {
+                i--;
+            }
+            else if(par[i][j] == 'L') {
+                j++;
+            }
+            else {
+                i++;
+            }
+        }
+        reverse(s.begin(), s.end());
+        cout<<s<<endl;
+    }
 
     return 0;
 }
